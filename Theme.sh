@@ -1,13 +1,13 @@
 #!/bin/bash
-# Termux Custom Theme with ASCII Logo + Prompt
+# Termux Theme + Logo + Prompt Installer
 
-echo -e "\n💠 Enter your theme name (example: Billal): "
+echo -e "\n💠 Enter your name (example: Billal): "
 read USERNAME
 
 THEME_DIR="$HOME/.termux"
 mkdir -p $THEME_DIR
 
-# ---------------- Colors ----------------
+# ---------- Colors ----------
 cat > $THEME_DIR/colors.properties <<EOL
 # $USERNAME Custom Termux Theme
 background=#0F111A
@@ -31,11 +31,15 @@ color14=#40E0D0
 color15=#FFFFFF
 EOL
 
-# ---------------- ASCII Logo + Prompt ----------------
+# ---------- Logo + Prompt ----------
 BASHRC="$HOME/.bashrc"
+
+# আগে থেকে ডুপ্লিকেট থাকলে ক্লিয়ার করি
+sed -i '/# Custom Termux Theme START/,/# Custom Termux Theme END/d' $BASHRC
+
 cat >> $BASHRC <<EOL
 
-# Custom ASCII Logo for $USERNAME
+# Custom Termux Theme START
 clear
 echo -e "\e[95m"
 echo "████████╗██████╗ ██████╗ ██████╗ ██╗   ██╗██╗   ██╗"
@@ -47,12 +51,12 @@ echo "   ╚═╝   ╚═╝     ╚═╝     ╚═╝      ╚════�
 echo -e "\e[0m"
 echo -e "\n💠 Welcome, $USERNAME!\n"
 
-# Custom colorful prompt
 PS1='[\[\e[1;35m\]$USERNAME\[\e[0m\]@\[\e[1;36m\]\h\[\e[0m\]]-\[\e[1;32m\]\w\[\e[0m\]\n>>> '
+# Custom Termux Theme END
 EOL
 
-# ---------------- Reload Settings ----------------
+# ---------- Apply ----------
 termux-reload-settings
-source $BASHRC
 
-echo -e "\n✅ Theme + Logo + Prompt Applied Successfully!"
+echo -e "\n✅ Theme + Logo + Prompt Installed!"
+echo -e "👉 Restart Termux to see the changes.\n"
