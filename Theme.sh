@@ -1,81 +1,93 @@
-#!/bin/bash
-# ==============================
-#  Termux Shell Customizer
-#  Created by Billu 🔥
-# ==============================
+#!/data/data/com.termux/files/usr/bin/bash
+# Termux Pure Setup (No External Links)
 
-clear
+set -e
 
-# 🔹 রঙের তালিকা
-colors=(31 32 33 34 35 36 37)
+# === CONFIG ===
+TITLE="T3RMUX"
+SUBTITLE="Termux-OS"
+BANNER_FONT="Big"
 
-# 🔹 র‍্যান্ডম রঙ বাছাই
-random_color() {
-    echo "${colors[$RANDOM % ${#colors[@]}]}"
+# === UTILS ===
+ok(){ echo -e "\033[1;32m[OK]\033[0m $*"; }
+backup_file(){ [ -f "$1" ] && cp "$1" "$1.bak.$(date +%s)"; }
+
+# === BASE TOOLS INSTALL ===
+pkg update -y && pkg upgrade -y
+pkg install -y zsh bash figlet toilet ruby nano
+gem install lolcat --no-document || true
+
+# === BANNER FUNCTION ===
+make_banner(){
+  clear
+  figlet -f "$BANNER_FONT" "$TITLE" | lolcat
+  echo "-----------------------------" | lolcat
+  echo "$SUBTITLE" | lolcat
+  echo
 }
 
-# 🔹 ইউজার ইনপুট
-echo -e "\033[1;36m=============================================\033[0m"
-echo -e "\033[1;32m      🔥 Termux Custom Banner Setup 🔥     \033[0m"
-echo -e "\033[1;36m=============================================\033[0m"
-echo
-read -p "👉 ব্যানার টেক্সট লিখুন: " banner
-read -p "👉 শেল নাম দিন (যেমন: billu@termux): " shellname
-echo
+# === WRITE .zshrc ===
+backup_file "$HOME/.zshrc"
+cat > "$HOME/.zshrc" <<EOF
+# --- Custom Termux ZSHRC ---
+export TERM=xterm-256color
+export EDITOR=nano
 
-# 🔹 কাস্টম শেল স্ক্রিপ্ট তৈরি করছি
-cat > ~/.custom_shell.sh <<EOF
-#!/bin/bash
-
-colors=(31 32 33 34 35 36 37)
-
-random_color() {
-    echo "\${colors[\$RANDOM % \${#colors[@]}]}"
+banner(){
+  clear
+  figlet -f "$BANNER_FONT" "$TITLE" | lolcat
+  echo "-----------------------------" | lolcat
+  echo "$SUBTITLE" | lolcat
+  echo
 }
+banner
 
-clear
-color=\$(random_color)
+# Prompt Style
+PROMPT='%F{cyan}>>>%f %F{green}%~%f \$ '
 
-echo -e "\033[1;\${color}m"
-echo "============================================="
-echo "       🔥  $banner  🔥"
-echo "============================================="
-echo -e "\033[1;35m   Created By: Itz Billu \033[0m"
-echo
+# Aliases
+alias cls='clear'
+alias ll='ls -la'
 
-# 🔹 প্রম্পট ডিজাইন
-PS1="[\[\e[1;32m\]$shellname\[\e[0m\]] - [\[\e[1;36m\]\w\[\e[0m\]] >>> "
+# --- END ---
 EOF
+ok ".zshrc created"
 
-chmod +x ~/.custom_shell.sh
+# === WRITE .bashrc ===
+backup_file "$HOME/.bashrc"
+cat > "$HOME/.bashrc" <<EOF
+# --- Custom Termux BASHRC ---
+export TERM=xterm-256color
+export EDITOR=nano
 
-# 🔹 পুরানো থিম থাকলে মুছে ফেলি
-BASHRC="$HOME/.bashrc"
-sed -i '/# Custom Termux Theme START/,/# Custom Termux Theme END/d' "$BASHRC"
-sed -i '/bash ~/.custom_shell.sh/d' "$BASHRC"
+banner(){
+  clear
+  figlet -f "$BANNER_FONT" "$TITLE" | lolcat
+  echo "-----------------------------" | lolcat
+  echo "$SUBTITLE" | lolcat
+  echo
+}
+banner
 
-# 🔹 নতুন থিম যোগ করছি
-cat >> "$BASHRC" <<'EOL'
+# Prompt Style
+PS1='\\[\\e[36m\\]>>>\\[\\e[0m\\] \\[\\e[32m\\]\\w\\[\\e[0m\\] \\$ '
 
-# Custom Termux Theme START
-clear
-echo -e "\e[95m"
-echo "████████╗██████╗ ██████╗ ██████╗ ██╗   ██╗██╗   ██╗"
-echo "╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██║   ██║╚██╗ ██╔╝"
-echo "   ██║   ██████╔╝██████╔╝██████╔╝██║   ██║ ╚████╔╝ "
-echo "   ██║   ██╔═══╝ ██╔═══╝ ██╔═══╝ ██║   ██║  ╚██╔╝  "
-echo "   ██║   ██║     ██║     ██║     ╚██████╔╝   ██║   "
-echo "   ╚═╝   ╚═╝     ╚═╝     ╚═╝      ╚═════╝    ╚═╝   "
-echo -e "\e[0m"
-echo -e "\n💠 Welcome, $USER!\n"
+# Aliases
+alias cls='clear'
+alias ll='ls -la'
 
-bash ~/.custom_shell.sh
-# Custom Termux Theme END
-EOL
+# --- END ---
+EOF
+ok ".bashrc created"
 
-# 🔹 সেটিংস রিলোড করি
-termux-reload-settings
+# === EXTRA KEYS (TERMUX) ===
+mkdir -p "$HOME/.termux"
+cat > "$HOME/.termux/termux.properties" <<'EOF'
+extra-keys = [[ '/', 'ls', '$', '~', UP, 'EXIT' ],
+               [ 'EX', 'CTRL', 'ALT', LEFT, DOWN, RIGHT ]]
+EOF
+termux-reload-settings || true
+ok "Termux keys configured"
 
-# ✅ ইনস্টলেশন শেষ
-echo -e "\n✅ কাস্টম ব্যানার + থিম ইনস্টল হয়েছে!"
-echo -e "👉 দয়া করে Termux রিস্টার্ট করুন পরিবর্তন দেখতে।\n"
+# === DONE ===
+ok "Setup complete! Restart Termux or run: exec zsh"
