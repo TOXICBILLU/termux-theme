@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================
-#  Pro Hacker Termux Custom Shell
-#  Created by Billal 🔥
+#  Termux Custom Shell
+#  Created by Billu 🔥
 # ==============================
 
 clear
