@@ -1,40 +1,61 @@
 #!/bin/bash
-# Termux Theme + Logo + Prompt Installer
+# ==============================
+#  Pro Hacker Termux Custom Shell
+#  Created by Billal 🔥
+# ==============================
 
-echo -e "\n💠 Enter your name (example: Billal): "
-read USERNAME
+clear
 
-THEME_DIR="$HOME/.termux"
-mkdir -p $THEME_DIR
+# Color list
+colors=(31 32 33 34 35 36 37)
 
-# ---------- Colors ----------
-cat > $THEME_DIR/colors.properties <<EOL
-# $USERNAME Custom Termux Theme
-background=#0F111A
-foreground=#A0E7E5
-cursor=#FF5E5B
-color0=#1B1D2A
-color1=#FF5E5B
-color2=#00FF85
-color3=#FFD700
-color4=#00BFFF
-color5=#FF69B4
-color6=#20B2AA
-color7=#FFFFFF
-color8=#808080
-color9=#FF4500
-color10=#32CD32
-color11=#FFA500
-color12=#1E90FF
-color13=#FF1493
-color14=#40E0D0
-color15=#FFFFFF
-EOL
+# Random color function
+random_color() {
+    echo "${colors[$RANDOM % ${#colors[@]}]}"
+}
 
-# ---------- Logo + Prompt ----------
-BASHRC="$HOME/.bashrc"
+# Panel UI
+echo -e "\033[1;36m=============================================\033[0m"
+echo -e "\033[1;32m        🔥 Termux Theme Setup 🔥        \033[0m"
+echo -e "\033[1;36m=============================================\033[0m"
+echo
+read -p "👉 Enter your Banner Text: " banner
+read -p "👉 Enter your Shell Name (ex: billu@termux): " shellname
+echo
 
-# আগে থেকে ডুপ্লিকেট থাকলে ক্লিয়ার করি
+# Save settings to custom shell file
+cat > ~/.custom_shell.sh <<'EOF'
+#!/bin/bash
+colors=(31 32 33 34 35 36 37)
+
+random_color() {
+    echo "\${colors[\$RANDOM % \${#colors[@]}]}"
+}
+
+clear
+color=\$(random_color)
+
+echo -e "\033[1;\${color}m"
+echo "============================================="
+echo "        🔥  $banner  🔥"
+echo "============================================="
+echo -e "\033[1;35m   Created By: Itz Billu \033[0m"
+echo
+echo -e "\033[0m"
+
+# Fancy PS1 (prompt style)
+PS1="\[\e[1;32m\][\u@$shellname] - [\w] >>> \[\e[0m\]"
+EOF
+
+chmod +x ~/.custom_shell.sh
+
+# Apply permanently
+if ! grep -q ".custom_shell.sh" ~/.bashrc; then
+    echo "bash ~/.custom_shell.sh" >> ~/.bashrc
+fi
+
+# Run first time
+bash ~/.custom_shell.sh# আগে থেকে ডুপ্লিকেট থাকলে ক্লিয়ার করি
 sed -i '/# Custom Termux Theme START/,/# Custom Termux Theme END/d' $BASHRC
 
 cat >> $BASHRC <<EOL
